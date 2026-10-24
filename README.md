@@ -1,251 +1,105 @@
-# IdeaSoft Hediye Paketi ve Planlı Teslimat Modülü
+# IdeaSoft Hediye Paketi ve Teslimat Modülü
 
-IdeaSoft ürün detay sayfalarına ücretli hediye paketi, isteğe bağlı teslim tarihi ve hediye kartı notu ekleyen özelleştirilebilir tema modülüdür.
+[![Doğrulama](https://github.com/midasdijital/ideasoft-gift-delivery-module/actions/workflows/ci.yml/badge.svg)](https://github.com/midasdijital/ideasoft-gift-delivery-module/actions/workflows/ci.yml)
 
-**Geliştiren:** Midas Dijital E-Ticaret Danışmanlık
+IdeaSoft ürün detay sayfalarına ücretli hediye paketi, talep edilen teslim tarihi ve hediye kartı notu eklemek için geliştirilen tema bileşeni.
+
+**Midas Dijital**, e-ticaret danışmanlığı ve mağaza geliştirme hizmetleri sunan bir ajanstır. Bu proje ajansın tema entegrasyonları için geliştirdiği açık kaynak bir bileşendir; IdeaSoft'un resmî ürünü değildir.
+
+> **2.0 geliştirme sürümü:** 1.x'teki sabit süreyle paket ekleme kaldırıldı. Hediye özelliği gerçek sepet sonucunu döndüren bir mağaza entegrasyonu kurulana kadar devre dışıdır. Bu dal henüz kararlı 2.0 release olarak yayınlanmamıştır.
 
 ## Özellikler
 
-- Standart ve premium hediye paketi seçenekleri
-- Seçilen hediye paketi ürününü otomatik olarak sepete ekleme
-- Paket seçeneklerine ürün görseli ekleme
-- Ürün görsellerinden paket detayına yönlendirme
-- İsteğe bağlı teslim tarihi
-- 250 karakter sınırlı hediye kartı notu
-- IdeaSoft Ürün Özelleştirme sistemiyle uyum
-- Modülleri ayrı ayrı açma ve kapatma
-- Mobil uyumlu modern tasarım
-- Tema rengini kolayca değiştirme
-- Hediye paketi ürünlerinin kendi sayfalarında modülü gizleme
+- Standart/premium paket ve ürün bazlı seçenekler.
+- Ana ürün başarısı doğrulandıktan sonra tek paket ekleme.
+- Çift tıklama koruması ve kısmi başarıda tekrar ürün eklemeyi engelleme.
+- Erişilebilir alanlar, durum mesajları ve mobil uyumlu CSS.
+- Harici çalışma zamanı kütüphanesi, CDN, izleme veya API anahtarı gerektirmez.
+- Ayrı CSS/JavaScript dosyaları; inline script gerektirmez.
 
-## Dosya Yapısı
+## Gereksinimler ve uyumluluk
 
-```text
-ideasoft-gift-delivery-module/
-├── src/
-│   └── gift-delivery-module.twig
-├── .gitignore
-├── LICENSE
-└── README.md
+IdeaSoft tema dosyalarına ve sepet entegrasyon koduna erişim gerekir. Satışa açık, stoğu uygun bir paket ürünü oluşturulmalıdır. Aynı ürün için sayfada yalnızca bir modül kullanın. `ideasoft-gift-package` ile `ideasoft-gift-delivery-module` alternatif ürünlerdir; ikisini birlikte yüklemeyin.
+
+Desteklenen buton işaretlemesi:
+
+```html
+<button
+  type="button"
+  data-selector="add-to-cart"
+  data-context="detail"
+  data-product-id="42"
+>
+  Sepete ekle
+</button>
 ```
 
-## Gereksinimler
-
-- IdeaSoft tema dosyalarına erişim
-- En az bir adet hediye paketi veya hizmet ürünü
-- Teslim tarihi ya da hediye kartı notu kullanılacaksa IdeaSoft Ürün Özelleştirme özelliği
-- Kullanılan özelleştirme grubunun hediye paketi ürünlerine atanması
+`.add-to-cart-button` sınıfı zorunlu değildir. Form submit, hızlı alışveriş, SPA geçişleri veya farklı buton yapıları ek tema entegrasyonu gerektirir. Dinleyici, hediye açıkken tıklamayı yakalar ve varsayılan tema işleyicisini durdurur; daha önce çalışan bir capture işleyicisiyle birlikte çift istek oluşmadığını test mağazasında doğrulayın. Genel IdeaSoft sürüm uyumluluğu veya canlı sipariş doğrulaması iddia edilmez.
 
 ## Kurulum
 
-`src/gift-delivery-module.twig` dosyasını IdeaSoft temanızın snippet klasörüne yükleyin.
-
-Örnek dosya yolu:
-
-```text
-html/snippets/product/gift-delivery-module.twig
-```
-
-Ardından ürün detay şablonunu açın:
-
-```text
-templates/product/detail.twig
-```
-
-Aşağıdaki bölümü bulun:
-
-```twig
-<div class="product-cart-buttons">
-```
-
-Bu bloğun hemen üstüne şu satırı ekleyin:
+1. [Repoyu](https://github.com/midasdijital/ideasoft-gift-delivery-module) klonlayın veya doğrulanmış sürümün ZIP'ini açın. `src/` asıl kaynaktır; `dist/` üretilir.
+2. `src/gift-delivery-module.twig` dosyasını temanın `html/snippets/product/` klasörüne yükleyin.
+3. `src/gift-delivery-module.css` ve `src/gift-delivery-module.js` dosyalarını temanızın statik dosya alanına yükleyin. Aşağıdaki `/assets/` yolu örnektir; gerçek URL'lerin 200 döndüğünü kontrol edin.
+4. Ürün detay şablonunda `.product-cart-buttons` bloğunun hemen üstüne ekleyin:
 
 ```twig
 {% include 'html/snippets/product/gift-delivery-module.twig' %}
 ```
 
-Tema klasör yapınız farklıysa include yolunu kendi temanıza göre düzenleyin.
-
-## Modülleri Açma ve Kapatma
-
-`gift-delivery-module.twig` dosyasının üst kısmındaki ayarları kullanabilirsiniz:
-
-```twig
-{% set giftModule = 'on' %}
-{% set standardGiftOption = 'on' %}
-{% set premiumGiftOption = 'on' %}
-{% set deliveryDateModule = 'on' %}
-{% set giftMessageModule = 'on' %}
-```
-
-Bir özelliği kapatmak için değerini `off` yapın.
-
-### Hediye paketi sistemini tamamen kapatma
-
-```twig
-{% set giftModule = 'off' %}
-```
-
-### Standart paketi kapatma
-
-```twig
-{% set standardGiftOption = 'off' %}
-```
-
-### Premium paketi kapatma
-
-```twig
-{% set premiumGiftOption = 'off' %}
-```
-
-### Teslim tarihini kapatma
-
-```twig
-{% set deliveryDateModule = 'off' %}
-```
-
-### Hediye kartı notunu kapatma
-
-```twig
-{% set giftMessageModule = 'off' %}
-```
-
-## Hediye Paketi Ürünlerini Ayarlama
-
-Hediye paketi seçenekleri IdeaSoft yönetim panelinde normal veya hizmet ürünü olarak oluşturulmalıdır.
-
-Standart paket ayarları:
-
-```twig
-{% set standardGiftProductId = 1001 %}
-{% set standardGiftTitle = 'Standart hediye paketi' %}
-{% set standardGiftDescription = 'Siparişiniz özenle paketlenerek gönderilir.' %}
-{% set standardGiftPrice = '100,00 TL' %}
-{% set standardGiftUrl = '/urun/standart-hediye-paketi' %}
-{% set standardGiftImage = '' %}
-```
-
-Premium paket ayarları:
-
-```twig
-{% set premiumGiftProductId = 1002 %}
-{% set premiumGiftTitle = 'Premium hediye paketi' %}
-{% set premiumGiftDescription = 'Siparişiniz premium kutuda özel olarak hazırlanır.' %}
-{% set premiumGiftPrice = '159,90 TL' %}
-{% set premiumGiftUrl = '/urun/premium-hediye-paketi' %}
-{% set premiumGiftImage = '' %}
-```
-
-### Ayarların açıklaması
-
-| Ayar | Açıklama |
-|---|---|
-| `ProductId` | IdeaSoft ürün ID’si |
-| `Title` | Müşterinin göreceği paket başlığı |
-| `Description` | Paket seçeneğinin kısa açıklaması |
-| `Price` | Ekranda gösterilecek fiyat |
-| `Url` | Hediye paketi ürün bağlantısı |
-| `Image` | Hediye paketi görsel bağlantısı |
-
-> Fiyat ayarı yalnızca müşteriye gösterilen metindir. Sepete yansıyacak gerçek ücret, IdeaSoft ürün kartındaki satış fiyatından alınır.
-
-## Görsel Ekleme
-
-Paket görsellerini tam bağlantı olarak ekleyebilirsiniz:
-
-```twig
-{% set standardGiftImage = 'https://www.siteadresi.com/gorseller/standart-paket.webp' %}
-{% set premiumGiftImage = 'https://www.siteadresi.com/gorseller/premium-paket.webp' %}
-```
-
-Görsel bağlantısı boş bırakılırsa ilgili pakette görsel gösterilmez:
-
-```twig
-{% set standardGiftImage = '' %}
-```
-
-## Ürün Özelleştirme Ayarları
-
-IdeaSoft panelinde aşağıdaki özelleştirme grubunu oluşturun:
-
-### Grup adı
-
-```text
-Teslimat ve Hediye Kartı Bilgileri
-```
-
-### Alanlar
-
-1. **Teslim Tarihi**
-   - Kısa metin alanı
-   - İsteğe bağlı
-
-2. **Hediye Kartı Notu**
-   - Metin alanı
-   - İsteğe bağlı
-
-Grup ve alan ID’lerini modülün üst kısmında tanımlayın:
-
-```twig
-{% set customizationGroupId = 1 %}
-{% set deliveryDateFieldId = 1 %}
-{% set giftMessageFieldId = 2 %}
-```
-
-Özelleştirme grubunu modülde kullanılan standart ve premium hediye paketi ürünlerine atayın.
-
-## Renk Ayarı
-
-Modülün ana rengini değiştirmek için:
-
-```twig
-{% set moduleAccentColor = '#dc2237' %}
-```
-
-Örnek renkler:
-
-```twig
-{% set moduleAccentColor = '#4A0C12' %}
-{% set moduleAccentColor = '#2563EB' %}
-{% set moduleAccentColor = '#111827' %}
-```
-
-## Çalışma Mantığı
-
-1. Müşteri ürün sayfasında hediye paketi seçeneğini açar.
-2. Standart veya premium paketi seçer.
-3. İsterse teslim tarihi ve hediye kartı notu girer.
-4. Ana ürün normal şekilde sepete eklenir.
-5. Seçilen hediye paketi ürünü ayrıca sepete eklenir.
-6. Özelleştirme bilgileri hediye paketi ürünüyle birlikte siparişe aktarılır.
-
-## IdeaSoft Uyumluluğu
-
-Modül, sepete ekleme butonunda aşağıdaki IdeaSoft yapısını kullanan temalar için hazırlanmıştır:
+5. Tema yerleşiminde CSS'i bir kez, mağazaya özel entegrasyonu ve ardından modül JavaScript'ini yükleyin:
 
 ```html
-data-selector="add-to-cart"
-data-context="detail"
-data-product-id="..."
+<link rel="stylesheet" href="/assets/gift-delivery-module.css" />
+<script src="/assets/midas-cart-adapter.local.js" defer></script>
+<script src="/assets/gift-delivery-module.js" defer></script>
 ```
 
-Özel olarak değiştirilmiş temalarda sepete ekleme butonunun CSS seçicisinin uyarlanması gerekebilir.
+6. Twig başındaki paket ürün ID'lerini `0` yerine mağazanızdaki gerçek pozitif ID'lerle değiştirin. Başlık, açıklama ve fiyat metinlerini düzenleyin. `standardGiftOption` / `premiumGiftOption` ile seçenekleri, `giftModule` ile tüm modülü `on` / `off` yapabilirsiniz.
+7. [Sepet entegrasyonu sözleşmesini](docs/cart-integration.md) uygulayın ve [mağaza kabul kontrollerini](docs/store-checklist.md) tamamlayın. Tema önbelleğini temizleyin.
 
-## Önemli Notlar
+Ürün ID'si veya entegrasyon yoksa hediye seçimi kapalı kalır; ana ürün normal tema akışıyla eklenebilir. CSS rengini kendi dosyanızda `.md-gift { --md-accent: #9f1239; }` ile özelleştirebilirsiniz. Metinler HTML olarak çalıştırılmaz.
 
-- Hediye paketi ürünleri satışa açık olmalıdır.
-- Hediye paketi ürünlerinin stokları bulunmalıdır.
-- Ekranda yazan fiyat ile IdeaSoft ürün fiyatı aynı tutulmalıdır.
-- Teslim tarihi veya hediye notu kullanılacaksa özelleştirme grubu doğru ürünlere atanmalıdır.
-- Değişikliklerden sonra IdeaSoft tema önbelleği temizlenmelidir.
-- Tarayıcıda test ederken `Ctrl + F5` ile zorla yenileme yapılması önerilir.
+`standardGiftUrl` / `premiumGiftUrl` ile ürün bağlantılarını, `standardGiftImage` / `premiumGiftImage` ile görselleri ekleyebilirsiniz. Boş veya güvenli HTTP(S) URL olmayan değerler gösterilmez. HTTPS mağazada HTTP hedefleri reddedilir. Uzak görseller ziyaretçinin IP adresini görebilir; aynı mağazada barındırılması önerilir.
 
-## Lisans
+Gösterilen fiyat yalnızca bilgilendirme metnidir; gerçek fiyatı, stoğu, varyantı ve yetkileri IdeaSoft sunucusu belirler. Bir ana ürün ekleme işlemi için bir paket eklenir; ana ürün adedi otomatik olarak pakete kopyalanmaz. Paket ve ana ürün ayrı sepet satırlarıdır, atomik bir işlem veya otomatik silme bağlantısı yoktur.
 
-Bu proje MIT Lisansı ile sunulmaktadır.
+## Teslim tarihi ve kart notu
 
-## Geliştirici
+Varsayılan olarak kapalıdır. Açmak için `deliveryDateModule` / `giftMessageModule` değerlerini `on` yapın ve `customizationGroupId`, `deliveryDateFieldId`, `giftMessageFieldId` değerlerini IdeaSoft panelindeki gerçek ID'lerle değiştirin. Grubu modülün gösterileceği **ana ürünlere** atayın.
 
-**Midas Dijital E-Ticaret Danışmanlık**
+Alanların değeri yalnızca `addMain` çağrısındaki `customization` nesnesiyle entegrasyona verilir. Ana ürünün sipariş özelleştirmesine kaydetmek entegrasyonun sorumluluğudur. Paket ürünü bu veriyi ikinci kez almaz. Modül yerleşik alanlara değer kopyalamaz, onları kapatmaz ve iç içe form oluşturmaz. Hediye seçimi kapatılınca modülün not/tarih değerleri temizlenir.
 
-IdeaSoft tema geliştirmeleri ve e-ticaret çözümleri.
+Tarih isteğe bağlı bir **teslimat talebidir**; teslimat garantisi veya kargo takvimi değildir. Tarayıcı geçmiş günü engeller; tatil, kesim saati ve teslimat kapasitesi mağaza/sunucu tarafından doğrulanmalıdır. Not isteğe bağlıdır ve en fazla 250 UTF-16 kod birimidir (bazı emojiler iki birim sayılır). Sunucu da uzunluğu ve alan yetkilerini doğrulamalıdır.
+
+## 1.x'ten geçiş
+
+Eski snippet, JavaScript ve gizli paket butonunu kaldırın. Yeni dosyaları birlikte yükleyin; eski ZIP'i yeni kaynaklarla karıştırmayın. 1.x'teki gecikmeye dayalı otomatik ekleme veya yerleşik özelleştirme alanlarını değiştirme davranışı korunmaz. Bu değişiklik mağazaya özel sepet entegrasyonu gerektirir. Yeni sürümü doğrudan canlı temanın üstüne yazmayın; test teması üzerinde doğrulayıp geçiş yapın. Eski sürüme dönüş, eski hata davranışlarını da geri getirir.
+
+## Geliştirme ve dağıtım
+
+Node.js yalnızca geliştirme içindir; mağazada Node.js çalışmaz. Node 24.15+ kullanın.
+
+```sh
+git clone https://github.com/midasdijital/ideasoft-gift-delivery-module.git
+cd ideasoft-gift-delivery-module
+npm ci --ignore-scripts
+npm run validate
+```
+
+`validate`: JavaScript sözdizimi, Twig çıktı kaçış kontrolleri, biçimlendirme, gerçek şablonları render eden DOM testleri ve ZIP üretimi. Twig.js testleri IdeaSoft'un sunucu Twig sürümünde yapılan bir testin yerine geçmez. CI ayrıca geliştirme bağımlılıkları için `npm audit` çalıştırır. Tarayıcıya gönderilen kodun çalışma zamanı npm bağımlılığı yoktur.
+
+`npm run build`, yalnızca kaynak ve belgeleri içeren `dist/ideasoft-gift-delivery-module-v2.0.0.zip` üretir. ZIP'in adı geliştirme paketinin sürümünü gösterir; kararlı yayın için etiket/release gerekir. ZIP üretimi aynı kaynakta aynı baytları verir. Test mağazası kontrolü henüz otomatikleştirilmemiştir.
+
+```text
+src/       Twig, JavaScript ve CSS
+docs/      Sepet sözleşmesi ve mağaza kabul kontrolleri
+tests/     Şablon ve davranış regresyon testleri
+scripts/   Kontrol ve dağıtım araçları
+```
+
+## Güvenlik, katkı ve lisans
+
+[Güvenlik politikası](SECURITY.md) · [Katkı rehberi](CONTRIBUTING.md) · [Değişiklik günlüğü](CHANGELOG.md) · [MIT lisansı](LICENSE)
+
+Müşteri ayarlarını, sipariş bilgilerini veya erişim anahtarlarını repoya eklemeyin. Açık kaynak bileşen herhangi bir hizmet seviyesi veya tüm temalarda çalışma garantisi içermez.
