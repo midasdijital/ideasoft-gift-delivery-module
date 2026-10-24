@@ -2,7 +2,7 @@
   "name": "@midasdijital/ideasoft-gift-delivery-module",
   "version": "2.0.0-rc.1",
   "private": true,
-  "description": "IdeaSoft mağazaları için ücretli hediye paketi, teslim tarihi talebi ve hediye kartı notu modülü. Midas Dijital e-ticaret danışmanlık ajansı tarafından geliştirilmiştir.",
+  "description": "Paid gift packaging, requested delivery dates, and gift card notes for IdeaSoft stores, developed by Midas Dijital.",
   "license": "MIT",
   "engines": {
     "node": "^24.15.0 || >=26.0.0"
